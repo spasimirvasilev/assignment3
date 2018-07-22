@@ -183,6 +183,7 @@ def FC(unAssignedVars, csp, allSolutions, trace):
 
         return [soln]  #each call returns a list of solutions found
 
+    bt_search.nodesExplored += 1
     solns = []         #so far we have no solutions recursive calls
     nxtvar = unAssignedVars.extract()
 
@@ -202,8 +203,9 @@ def FC(unAssignedVars, csp, allSolutions, trace):
             if new_solns:
                 solns.extend(new_solns)
             if len(solns) > 0 and not allSolutions:
+                nxtvar.restoreValues(nxtvar, val)
                 break #don't bother with other values of nxtvar
-        Variable.restoreValues(nxtvar, val)
+        nxtvar.restoreValues(nxtvar, val)
 
     nxtvar.unAssign()
     unAssignedVars.insert(nxtvar)
