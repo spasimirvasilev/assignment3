@@ -175,7 +175,40 @@ def FC(unAssignedVars, csp, allSolutions, trace):
     #Implementing handling of the trace parameter is optional
     #but it can be useful for debugging
 
-    util.raiseNotDefined()
+    if unAssignedVars.empty():
+        if trace: print "{} Solution Found".format(csp.name())
+        soln = []
+        for v in csp.variables():
+            soln.append((v, v.getValue()))
+
+        return [soln]  #each call returns a list of solutions found
+
+    solns = []         #so far we have no solutions recursive calls
+    nxtvar = unAssignedVars.extract()
+
+    if trace: print "==>Trying {}".format(nxtvar.name())
+    for val in nxtvar.curDomain():
+        if trace: print "==> {} = {}".format(nxtvar.name(), val)
+        nxtvar.setValue(val)
+        noDwo = True
+        for cnstr in csp.constraintsOf(nxtvar):
+            if cnstr.numUnassigned() == 1:
+                if FCCheck(cnstr, nxtvar, val) == "DWO": #prune future variables
+                    noDwo = False
+                    if trace: print "<==falsified constraint\n"
+                    break
+        if noDwo:
+            new_solns = FC(unAssignedVars, csp, allSolutions, trace)
+            if new_solns:
+                solns.extend(new_solns)
+            if len(solns) > 0 and not allSolutions:
+                break #don't bother with other values of nxtvar
+        Variable.restoreValues(nxtvar, val)
+
+    nxtvar.unAssign()
+    unAssignedVars.insert(nxtvar)
+
+    return solns
 
 def GacEnforce(constraints, csp, reasonVar, reasonVal):
     '''Establish GAC on constraints by pruning values
