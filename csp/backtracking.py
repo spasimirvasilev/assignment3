@@ -262,7 +262,7 @@ def GAC(unAssignedVars, csp, allSolutions, trace):
             soln.append((v, v.getValue()))
         return [soln]
     bt_search.nodesExplored += 1
-    solns = []    
+    solns = []
     nxtvar = unAssignedVars.extract()
     if trace: print "==>Trying {}".format(nxtvar.name())
     for val in nxtvar.curDomain():
